@@ -1,0 +1,2141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Blessing Relationship Portal</title>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #07070b;
+      --card: #111117;
+      --card2: #17171f;
+      --text: #f7f7fb;
+      --muted: #9292a0;
+      --pink: #ff4f91;
+      --purple: #8c63ff;
+      --green: #45e39a;
+      --red: #ff5577;
+      --border: rgba(255,255,255,.08);
+    }
+
+    body {
+      min-height: 100vh;
+      font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+      color: var(--text);
+
+      background:
+        radial-gradient(
+          circle at 20% 10%,
+          rgba(255,79,145,.12),
+          transparent 30%
+        ),
+        radial-gradient(
+          circle at 80% 80%,
+          rgba(140,99,255,.12),
+          transparent 30%
+        ),
+        var(--bg);
+
+      overflow-x: hidden;
+    }
+
+    /* =====================================
+       BACKGROUND
+    ===================================== */
+
+    .particles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .particle {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      color: var(--pink);
+      opacity: .12;
+      animation: float 12s linear infinite;
+    }
+
+    @keyframes float {
+      from {
+        transform:
+          translateY(110vh)
+          rotate(0deg);
+      }
+
+      to {
+        transform:
+          translateY(-10vh)
+          rotate(360deg);
+      }
+    }
+
+    /* =====================================
+       SCREEN SYSTEM
+    ===================================== */
+
+    .screen {
+      position: relative;
+      z-index: 2;
+
+      min-height: 100vh;
+
+      display: none;
+      align-items: center;
+      justify-content: center;
+
+      padding: 24px;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    /* =====================================
+       GENERAL
+    ===================================== */
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    [data-lucide] {
+      width: 18px;
+      height: 18px;
+      stroke-width: 2;
+    }
+
+    /* =====================================
+       LOADING SCREEN
+    ===================================== */
+
+    .loading-box {
+      width: min(420px, 100%);
+      text-align: center;
+    }
+
+    .loading-logo {
+      width: 78px;
+      height: 78px;
+
+      margin: 0 auto 24px;
+
+      display: grid;
+      place-items: center;
+
+      border-radius: 24px;
+
+      background:
+        linear-gradient(
+          135deg,
+          var(--pink),
+          var(--purple)
+        );
+
+      box-shadow:
+        0 0 55px
+        rgba(255,79,145,.25);
+
+      animation: logoPulse 2s infinite;
+    }
+
+    .loading-logo svg {
+      width: 34px;
+      height: 34px;
+      stroke-width: 1.8;
+    }
+
+    @keyframes logoPulse {
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.07);
+      }
+    }
+
+    .loading-box h1 {
+      font-size: 28px;
+      margin-bottom: 9px;
+    }
+
+    .loading-box p {
+      color: var(--muted);
+      margin-bottom: 28px;
+      line-height: 1.6;
+    }
+
+    .progress-container {
+      height: 8px;
+
+      background: #23232d;
+
+      border-radius: 30px;
+
+      overflow: hidden;
+    }
+
+    .progress {
+      width: 0%;
+      height: 100%;
+
+      background:
+        linear-gradient(
+          90deg,
+          var(--pink),
+          var(--purple)
+        );
+
+      border-radius: inherit;
+
+      transition: width .2s ease;
+    }
+
+    .loading-percent {
+      margin-top: 12px;
+
+      color: var(--muted);
+
+      font-size: 13px;
+    }
+
+    /* =====================================
+       LOGIN
+    ===================================== */
+
+    .login-card {
+      width: min(440px, 100%);
+
+      padding: 34px;
+
+      border:
+        1px solid var(--border);
+
+      background:
+        rgba(17,17,23,.84);
+
+      backdrop-filter: blur(20px);
+
+      border-radius: 26px;
+
+      box-shadow:
+        0 25px 80px
+        rgba(0,0,0,.4);
+
+      animation: cardIn .7s ease;
+    }
+
+    @keyframes cardIn {
+      from {
+        opacity: 0;
+        transform:
+          translateY(25px)
+          scale(.97);
+      }
+
+      to {
+        opacity: 1;
+        transform:
+          translateY(0)
+          scale(1);
+      }
+    }
+
+    .portal-label {
+      color: var(--pink);
+
+      font-size: 11px;
+
+      font-weight: 700;
+
+      letter-spacing: 2px;
+
+      margin-bottom: 11px;
+    }
+
+    .login-card h2 {
+      font-size: 29px;
+      margin-bottom: 9px;
+    }
+
+    .login-card > p {
+      color: var(--muted);
+
+      line-height: 1.65;
+
+      margin-bottom: 28px;
+    }
+
+    label {
+      display: block;
+
+      color: var(--muted);
+
+      font-size: 13px;
+
+      margin-bottom: 8px;
+    }
+
+    input {
+      width: 100%;
+
+      padding: 14px 15px;
+
+      border:
+        1px solid var(--border);
+
+      border-radius: 12px;
+
+      background: #0c0c11;
+
+      color: white;
+
+      outline: none;
+
+      margin-bottom: 18px;
+
+      transition: .2s;
+    }
+
+    input:focus {
+      border-color: var(--pink);
+
+      box-shadow:
+        0 0 0 3px
+        rgba(255,79,145,.1);
+    }
+
+    .primary-btn {
+      width: 100%;
+
+      padding: 15px;
+
+      border: 0;
+
+      border-radius: 13px;
+
+      color: white;
+
+      font-weight: 700;
+
+      background:
+        linear-gradient(
+          90deg,
+          var(--pink),
+          var(--purple)
+        );
+
+      box-shadow:
+        0 12px 30px
+        rgba(255,79,145,.18);
+
+      transition: .25s;
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-2px);
+
+      box-shadow:
+        0 16px 35px
+        rgba(255,79,145,.28);
+    }
+
+    .tiny {
+      text-align: center;
+
+      color: #666673;
+
+      font-size: 11px;
+
+      margin-top: 18px;
+    }
+
+    /* =====================================
+       DASHBOARD
+    ===================================== */
+
+    .dashboard {
+      width: min(900px, 100%);
+
+      padding: 30px 0;
+    }
+
+    .topbar {
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      gap: 15px;
+
+      margin-bottom: 25px;
+    }
+
+    .brand-small {
+      display: flex;
+
+      align-items: center;
+
+      gap: 10px;
+    }
+
+    .brand-small > span {
+      width: 39px;
+      height: 39px;
+
+      display: grid;
+      place-items: center;
+
+      border-radius: 11px;
+
+      background:
+        linear-gradient(
+          135deg,
+          var(--pink),
+          var(--purple)
+        );
+    }
+
+    .brand-small > span svg {
+      width: 19px;
+      height: 19px;
+    }
+
+    .brand-small strong {
+      font-size: 14px;
+    }
+
+    .status {
+      display: flex;
+
+      align-items: center;
+
+      gap: 7px;
+
+      padding: 8px 11px;
+
+      border-radius: 30px;
+
+      color: var(--green);
+
+      font-size: 11px;
+
+      border:
+        1px solid
+        rgba(69,227,154,.18);
+
+      background:
+        rgba(69,227,154,.06);
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+
+      border-radius: 50%;
+
+      background: var(--green);
+
+      box-shadow:
+        0 0 10px var(--green);
+    }
+
+    /* =====================================
+       HERO
+    ===================================== */
+
+    .hero {
+      padding: 35px;
+
+      border-radius: 26px;
+
+      border:
+        1px solid var(--border);
+
+      background:
+        radial-gradient(
+          circle at 90% 0%,
+          rgba(140,99,255,.15),
+          transparent 30%
+        ),
+        radial-gradient(
+          circle at 0% 100%,
+          rgba(255,79,145,.12),
+          transparent 35%
+        ),
+        var(--card);
+
+      margin-bottom: 18px;
+    }
+
+    .hero small {
+      color: var(--pink);
+
+      font-weight: 700;
+
+      letter-spacing: 1.5px;
+
+      font-size: 11px;
+    }
+
+    .hero h1 {
+      font-size:
+        clamp(32px, 6vw, 54px);
+
+      margin:
+        8px 0 12px;
+    }
+
+    .hero p {
+      color: var(--muted);
+
+      max-width: 650px;
+
+      line-height: 1.7;
+    }
+
+    /* =====================================
+       METRICS
+    ===================================== */
+
+    .grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(2, 1fr);
+
+      gap: 15px;
+
+      margin-bottom: 18px;
+    }
+
+    .metric {
+      padding: 23px;
+
+      border:
+        1px solid var(--border);
+
+      border-radius: 20px;
+
+      background: var(--card);
+    }
+
+    .metric-header {
+      display: flex;
+
+      justify-content: space-between;
+
+      gap: 15px;
+
+      color: var(--muted);
+
+      font-size: 12px;
+
+      margin-bottom: 13px;
+    }
+
+    .metric-value {
+      font-size: 28px;
+
+      font-weight: 700;
+
+      margin-bottom: 13px;
+    }
+
+    .bar {
+      height: 7px;
+
+      background: #24242f;
+
+      border-radius: 20px;
+
+      overflow: hidden;
+    }
+
+    .bar span {
+      display: block;
+
+      height: 100%;
+
+      border-radius: inherit;
+
+      background:
+        linear-gradient(
+          90deg,
+          var(--pink),
+          var(--purple)
+        );
+    }
+
+    /* =====================================
+       INFORMATION PANEL
+    ===================================== */
+
+    .info-panel {
+      padding: 24px;
+
+      background: var(--card);
+
+      border:
+        1px solid var(--border);
+
+      border-radius: 20px;
+
+      margin-bottom: 18px;
+    }
+
+    .info-row {
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      gap: 20px;
+
+      padding: 13px 0;
+
+      border-bottom:
+        1px solid
+        rgba(255,255,255,.05);
+
+      font-size: 13px;
+    }
+
+    .info-row:last-child {
+      border-bottom: 0;
+    }
+
+    .info-row span {
+      color: var(--muted);
+    }
+
+    .success {
+      color: var(--green);
+    }
+
+    .danger {
+      color: var(--red);
+    }
+
+    /* =====================================
+       BUTTONS
+    ===================================== */
+
+    .check-btn {
+      width: 100%;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      gap: 9px;
+
+      padding: 17px;
+
+      border: 0;
+
+      border-radius: 15px;
+
+      background: white;
+
+      color: #09090d;
+
+      font-weight: 700;
+
+      transition: .25s;
+    }
+
+    .check-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    /* =====================================
+       SCANNER
+    ===================================== */
+
+    .scan-card {
+      width: min(520px, 100%);
+
+      padding: 40px 25px;
+
+      text-align: center;
+    }
+
+    .scanner {
+      width: 120px;
+      height: 120px;
+
+      position: relative;
+
+      display: grid;
+      place-items: center;
+
+      margin:
+        0 auto 30px;
+
+      border:
+        2px solid
+        rgba(255,79,145,.25);
+
+      border-radius: 50%;
+
+      animation:
+        scanPulse 1.5s infinite;
+    }
+
+    .scanner svg {
+      width: 42px;
+      height: 42px;
+
+      stroke-width: 1.5;
+    }
+
+    .scanner::after {
+      content: "";
+
+      position: absolute;
+
+      width: 150%;
+      height: 2px;
+
+      background:
+        linear-gradient(
+          90deg,
+          transparent,
+          var(--pink),
+          transparent
+        );
+
+      animation:
+        scannerLine 1.4s infinite;
+    }
+
+    @keyframes scanPulse {
+      50% {
+        box-shadow:
+          0 0 50px
+          rgba(255,79,145,.2);
+      }
+    }
+
+    @keyframes scannerLine {
+      0% {
+        transform:
+          translateY(-55px);
+      }
+
+      100% {
+        transform:
+          translateY(55px);
+      }
+    }
+
+    .scan-card h2 {
+      margin-bottom: 10px;
+    }
+
+    .scan-card p {
+      color: var(--muted);
+
+      margin-bottom: 25px;
+
+      line-height: 1.6;
+    }
+
+    /* =====================================
+       REVEAL
+    ===================================== */
+
+    .reveal {
+      width: min(700px, 100%);
+
+      text-align: center;
+    }
+
+    .reveal-card {
+      padding: 40px 28px;
+
+      border-radius: 30px;
+
+      border:
+        1px solid
+        rgba(255,79,145,.25);
+
+      background:
+        radial-gradient(
+          circle at 50% 0%,
+          rgba(255,79,145,.16),
+          transparent 40%
+        ),
+        var(--card);
+
+      animation:
+        revealIn .8s
+        cubic-bezier(.2,.8,.2,1);
+    }
+
+    @keyframes revealIn {
+      from {
+        opacity: 0;
+
+        transform:
+          scale(.8)
+          rotate(-2deg);
+      }
+
+      to {
+        opacity: 1;
+
+        transform:
+          scale(1)
+          rotate(0);
+      }
+    }
+
+    .big-heart {
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      margin-bottom: 15px;
+
+      animation:
+        heartbeat 1s infinite;
+    }
+
+    .big-heart svg {
+      width: 70px;
+      height: 70px;
+
+      stroke-width: 1.4;
+
+      color: var(--pink);
+    }
+
+    @keyframes heartbeat {
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      15% {
+        transform: scale(1.15);
+      }
+
+      30% {
+        transform: scale(1);
+      }
+
+      45% {
+        transform: scale(1.1);
+      }
+    }
+
+    .reveal-card h1 {
+      font-size:
+        clamp(34px, 7vw, 60px);
+
+      margin-bottom: 12px;
+    }
+
+    .reveal-card > p {
+      color: var(--muted);
+
+      line-height: 1.7;
+
+      margin-bottom: 25px;
+    }
+
+    /* =====================================
+       RESULT
+    ===================================== */
+
+    .result {
+      text-align: left;
+
+      background: #0c0c12;
+
+      border:
+        1px solid var(--border);
+
+      border-radius: 18px;
+
+      padding: 20px;
+
+      margin-bottom: 20px;
+    }
+
+    .result-row {
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      gap: 15px;
+
+      padding: 12px 0;
+
+      border-bottom:
+        1px solid
+        rgba(255,255,255,.05);
+
+      font-size: 13px;
+    }
+
+    .result-row:last-child {
+      border: 0;
+    }
+
+    .result-row span {
+      color: var(--muted);
+    }
+
+    /* =====================================
+       FINAL MESSAGE
+    ===================================== */
+
+    .love-message {
+      padding: 21px;
+
+      border-radius: 17px;
+
+      background:
+        rgba(255,79,145,.07);
+
+      border:
+        1px solid
+        rgba(255,79,145,.15);
+
+      line-height: 1.75;
+
+      margin-bottom: 22px;
+    }
+
+    .love-message strong {
+      color: var(--pink);
+    }
+
+    /* =====================================
+       RESTART
+    ===================================== */
+
+    .restart {
+      display: inline-flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      gap: 9px;
+
+      padding: 13px 20px;
+
+      border: 0;
+
+      border-radius: 12px;
+
+      background: #22222d;
+
+      color: white;
+
+      transition: .2s;
+    }
+
+    .restart:hover {
+      background: #2b2b37;
+
+      transform: translateY(-1px);
+    }
+
+    /* =====================================
+       MOBILE
+    ===================================== */
+
+    @media (max-width: 600px) {
+
+      .screen {
+        padding: 17px;
+      }
+
+      .login-card {
+        padding: 25px;
+      }
+
+      .hero {
+        padding: 25px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        align-items: flex-start;
+      }
+
+      .status {
+        font-size: 9px;
+      }
+
+      .info-row,
+      .result-row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .reveal-card {
+        padding: 32px 20px;
+      }
+    }
+  </style>
+</head>
+
+
+<body>
+
+  <!-- =====================================
+       BACKGROUND ICONS
+  ====================================== -->
+
+  <div
+    class="particles"
+    id="particles">
+  </div>
+
+
+  <!-- =====================================
+       LOADING SCREEN
+  ====================================== -->
+
+  <section
+    class="screen active"
+    id="loadingScreen">
+
+    <div class="loading-box">
+
+      <div class="loading-logo">
+        <i data-lucide="heart"></i>
+      </div>
+
+      <h1>
+        Relationship OS
+      </h1>
+
+      <p id="loadingText">
+        Initializing relationship management system...
+      </p>
+
+      <div class="progress-container">
+
+        <div
+          class="progress"
+          id="loadingProgress">
+        </div>
+
+      </div>
+
+      <div
+        class="loading-percent"
+        id="loadingPercent">
+
+        0%
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================
+       LOGIN SCREEN
+  ====================================== -->
+
+  <section
+    class="screen"
+    id="loginScreen">
+
+    <div class="login-card">
+
+      <div class="portal-label">
+        PRIVATE RELATIONSHIP PORTAL
+      </div>
+
+      <h2>
+        Welcome, Blessing
+      </h2>
+
+      <p>
+        Your personal relationship dashboard
+        is ready. Verify your identity to continue.
+      </p>
+
+      <label for="name">
+        Account holder
+      </label>
+
+      <input
+        id="name"
+        type="text"
+        value="Blessing"
+        placeholder="Enter your name"
+      >
+
+      <label for="code">
+        Relationship access code
+      </label>
+
+      <input
+        id="code"
+        type="password"
+        placeholder="Enter access code"
+      >
+
+      <button
+        class="primary-btn"
+        onclick="enterPortal()">
+
+        Access Relationship Portal
+
+      </button>
+
+      <div class="tiny">
+        Secured by De Great Technologies
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================
+       PERSONALIZED DASHBOARD
+  ====================================== -->
+
+  <section
+    class="screen"
+    id="dashboardScreen">
+
+    <div class="dashboard">
+
+      <div class="topbar">
+
+        <div class="brand-small">
+
+          <span>
+            <i data-lucide="heart"></i>
+          </span>
+
+          <strong>
+            De Great × Blessing
+          </strong>
+
+        </div>
+
+        <div class="status">
+
+          <span class="dot"></span>
+
+          RELATIONSHIP ACTIVE
+
+        </div>
+
+      </div>
+
+
+      <div class="hero">
+
+        <small>
+          PRIVATE RELATIONSHIP DASHBOARD
+        </small>
+
+        <h1>
+          Hello, Blessing.
+        </h1>
+
+        <p>
+          Welcome back to your personal relationship
+          dashboard. The system has successfully
+          identified you as the one and only Blessing
+          belonging to De Great.
+        </p>
+
+      </div>
+
+
+      <div class="grid">
+
+
+        <div class="metric">
+
+          <div class="metric-header">
+
+            <span>
+              Cuteness Level
+            </span>
+
+            <span>
+              98%
+            </span>
+
+          </div>
+
+          <div class="metric-value">
+            98%
+          </div>
+
+          <div class="bar">
+
+            <span
+              style="width:98%">
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div class="metric">
+
+          <div class="metric-header">
+
+            <span>
+              Ability To Make De Great Smile
+            </span>
+
+            <span>
+              100%
+            </span>
+
+          </div>
+
+          <div class="metric-value">
+            100%
+          </div>
+
+          <div class="bar">
+
+            <span
+              style="width:100%">
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div class="metric">
+
+          <div class="metric-header">
+
+            <span>
+              Ability To Stress De Great
+            </span>
+
+            <span>
+              147%
+            </span>
+
+          </div>
+
+          <div class="metric-value">
+            147%
+          </div>
+
+          <div class="bar">
+
+            <span
+              style="width:100%">
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div class="metric">
+
+          <div class="metric-header">
+
+            <span>
+              Demon Slayer Energy
+            </span>
+
+            <span>
+              MAX
+            </span>
+
+          </div>
+
+          <div class="metric-value">
+            MAX
+          </div>
+
+          <div class="bar">
+
+            <span
+              style="width:100%">
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="info-panel">
+
+
+        <div class="info-row">
+
+          <span>
+            Account Holder
+          </span>
+
+          <strong>
+            Blessing
+          </strong>
+
+        </div>
+
+
+        <div class="info-row">
+
+          <span>
+            Relationship Partner
+          </span>
+
+          <strong>
+            De Great
+          </strong>
+
+        </div>
+
+
+        <div class="info-row">
+
+          <span>
+            Relationship Started
+          </span>
+
+          <strong>
+            24 January 2026
+          </strong>
+
+        </div>
+
+
+        <div class="info-row">
+
+          <span>
+            Latest Anniversary
+          </span>
+
+          <strong>
+            8 Months — 24 September 2026
+          </strong>
+
+        </div>
+
+
+        <div class="info-row">
+
+          <span>
+            2026 Achievement
+          </span>
+
+          <strong>
+            Graduated
+          </strong>
+
+        </div>
+
+
+        <div class="info-row">
+
+          <span>
+            Favourite Anime
+          </span>
+
+          <strong>
+            Demon Slayer
+          </strong>
+
+        </div>
+
+
+        <div class="info-row">
+
+          <span>
+            Relationship Status
+          </span>
+
+          <strong class="success">
+            STILL STUCK WITH DE GREAT
+          </strong>
+
+        </div>
+
+
+        <div class="info-row">
+
+          <span>
+            Outstanding Food Debt
+          </span>
+
+          <strong class="danger">
+            ₦∞
+          </strong>
+
+        </div>
+
+
+      </div>
+
+
+      <button
+        class="check-btn"
+        onclick="startScan()">
+
+        <i data-lucide="scan-search"></i>
+
+        RUN FINAL RELATIONSHIP CHECK
+
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================
+       SCANNING SCREEN
+  ====================================== -->
+
+  <section
+    class="screen"
+    id="scanScreen">
+
+    <div class="scan-card">
+
+      <div class="scanner">
+
+        <i data-lucide="heart"></i>
+
+      </div>
+
+      <h2 id="scanTitle">
+        Analyzing relationship...
+      </h2>
+
+      <p id="scanText">
+        Please wait while the system performs
+        its routine inspection.
+      </p>
+
+      <div class="progress-container">
+
+        <div
+          class="progress"
+          id="scanProgress">
+        </div>
+
+      </div>
+
+      <div
+        class="loading-percent"
+        id="scanPercent">
+
+        0%
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================
+       FINAL REVEAL
+  ====================================== -->
+
+  <section
+    class="screen"
+    id="revealScreen">
+
+    <div class="reveal">
+
+      <div class="reveal-card">
+
+        <div class="big-heart">
+
+          <i data-lucide="heart"></i>
+
+        </div>
+
+
+        <h1>
+          GOTCHA, BABE!
+        </h1>
+
+
+        <p>
+          If you actually went through all of that
+          thinking this was some serious relationship
+          system, you have officially been deceived.
+        </p>
+
+
+        <div class="result">
+
+
+          <div class="result-row">
+
+            <span>
+              Relationship
+            </span>
+
+            <strong class="success">
+              STILL ACTIVE
+            </strong>
+
+          </div>
+
+
+          <div class="result-row">
+
+            <span>
+              Time Together
+            </span>
+
+            <strong>
+              Since 24 January 2026
+            </strong>
+
+          </div>
+
+
+          <div class="result-row">
+
+            <span>
+              Latest Milestone
+            </span>
+
+            <strong>
+              8 Months
+            </strong>
+
+          </div>
+
+
+          <div class="result-row">
+
+            <span>
+              Demon Slayer Status
+            </span>
+
+            <strong>
+              STILL YOUR OBSESSION
+            </strong>
+
+          </div>
+
+
+          <div class="result-row">
+
+            <span>
+              Cancellation
+            </span>
+
+            <strong>
+              NOT AVAILABLE
+            </strong>
+
+          </div>
+
+
+        </div>
+
+
+        <div class="love-message">
+
+          <strong>
+            Blessing
+          </strong>
+
+          <br><br>
+
+          From January 24 till now, we've already
+          made it through 8 months together, and
+          honestly, I wouldn't trade all the memories,
+          laughs, random conversations, and moments
+          we've shared for anything.
+
+          <br><br>
+
+          You've graduated, we've reached another
+          milestone, and somehow you're still here
+          disturbing my peace.
+
+          <br><br>
+
+          I just wanted to remind you that I love
+          and appreciate you, and yes, your favourite
+          software engineer still has plenty more
+          surprises for you.
+
+          <br><br>
+
+          So congratulations.
+
+          <br><br>
+
+          <strong>
+            You have successfully renewed your
+            De Great subscription.
+          </strong>
+
+        </div>
+
+
+        <button
+          class="restart"
+          onclick="location.reload()">
+
+          <i data-lucide="rotate-ccw"></i>
+
+          RUN THE PRANK AGAIN
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================
+       JAVASCRIPT
+  ====================================== -->
+
+  <script>
+
+    /* =====================================
+       INITIALIZE ICONS
+    ====================================== */
+
+    lucide.createIcons();
+
+
+    /* =====================================
+       BACKGROUND ICONS
+    ====================================== */
+
+    const particleContainer =
+      document.getElementById("particles");
+
+    const icons = [
+      "heart",
+      "sparkles",
+      "star",
+      "heart-handshake"
+    ];
+
+    for (let i = 0; i < 18; i++) {
+
+      const particle =
+        document.createElement("i");
+
+      particle.setAttribute(
+        "data-lucide",
+        icons[
+          Math.floor(
+            Math.random() * icons.length
+          )
+        ]
+      );
+
+      particle.className =
+        "particle";
+
+      particle.style.left =
+        Math.random() * 100 + "%";
+
+      particle.style.animationDuration =
+        (8 + Math.random() * 10) + "s";
+
+      particle.style.animationDelay =
+        Math.random() * 10 + "s";
+
+      particleContainer.appendChild(
+        particle
+      );
+
+    }
+
+    lucide.createIcons();
+
+
+    /* =====================================
+       SCREEN SWITCHER
+    ====================================== */
+
+    function showScreen(id) {
+
+      document
+        .querySelectorAll(".screen")
+        .forEach(screen => {
+
+          screen.classList.remove(
+            "active"
+          );
+
+        });
+
+      document
+        .getElementById(id)
+        .classList.add("active");
+
+      lucide.createIcons();
+
+    }
+
+
+    /* =====================================
+       INITIAL LOADING
+    ====================================== */
+
+    let loadingProgress = 0;
+
+    const loadingBar =
+      document.getElementById(
+        "loadingProgress"
+      );
+
+    const loadingPercent =
+      document.getElementById(
+        "loadingPercent"
+      );
+
+    const loadingText =
+      document.getElementById(
+        "loadingText"
+      );
+
+
+    const loadingMessages = [
+
+      "Initializing relationship management system...",
+
+      "Loading Blessing's profile...",
+
+      "Analyzing relationship data...",
+
+      "Checking cuteness levels...",
+
+      "Calculating stress potential...",
+
+      "Synchronizing relationship database...",
+
+      "Almost ready..."
+
+    ];
+
+
+    const loadingInterval =
+      setInterval(() => {
+
+        loadingProgress +=
+          Math.floor(
+            Math.random() * 8
+          ) + 3;
+
+
+        if (loadingProgress >= 100) {
+
+          loadingProgress = 100;
+
+          clearInterval(
+            loadingInterval
+          );
+
+          setTimeout(() => {
+
+            showScreen(
+              "loginScreen"
+            );
+
+          }, 700);
+
+        }
+
+
+        loadingBar.style.width =
+          loadingProgress + "%";
+
+
+        loadingPercent.textContent =
+          loadingProgress + "%";
+
+
+        const index =
+          Math.min(
+
+            Math.floor(
+              loadingProgress / 15
+            ),
+
+            loadingMessages.length - 1
+
+          );
+
+
+        loadingText.textContent =
+          loadingMessages[index];
+
+
+      }, 180);
+
+
+    /* =====================================
+       LOGIN
+    ====================================== */
+
+    function enterPortal() {
+
+      const name =
+        document
+          .getElementById("name")
+          .value
+          .trim();
+
+
+      if (!name) {
+
+        alert(
+          "Please enter your name."
+        );
+
+        return;
+
+      }
+
+
+      showScreen(
+        "dashboardScreen"
+      );
+
+    }
+
+
+    /* =====================================
+       RELATIONSHIP SCAN
+    ====================================== */
+
+    function startScan() {
+
+      showScreen(
+        "scanScreen"
+      );
+
+
+      let progress = 0;
+
+
+      const scanBar =
+        document.getElementById(
+          "scanProgress"
+        );
+
+
+      const scanPercent =
+        document.getElementById(
+          "scanPercent"
+        );
+
+
+      const scanTitle =
+        document.getElementById(
+          "scanTitle"
+        );
+
+
+      const scanText =
+        document.getElementById(
+          "scanText"
+        );
+
+
+      const scanMessages = [
+
+        [
+          "Scanning emotional compatibility...",
+          "Analyzing communication patterns..."
+        ],
+
+        [
+          "Checking happiness levels...",
+          "Relationship stability looks suspiciously good..."
+        ],
+
+        [
+          "Detecting stress-generation capabilities...",
+          "WARNING: Extremely high levels detected."
+        ],
+
+        [
+          "Checking loyalty protocols...",
+          "No major issues detected."
+        ],
+
+        [
+          "Calculating final relationship score...",
+          "Please remain patient..."
+        ],
+
+        [
+          "Finalizing report...",
+          "Almost done..."
+        ]
+
+      ];
+
+
+      const interval =
+        setInterval(() => {
+
+          progress +=
+            Math.floor(
+              Math.random() * 7
+            ) + 4;
+
+
+          if (progress >= 100) {
+
+            progress = 100;
+
+            clearInterval(interval);
+
+
+            scanTitle.textContent =
+              "Analysis complete.";
+
+
+            scanText.textContent =
+              "Preparing final relationship report...";
+
+
+            setTimeout(() => {
+
+              showScreen(
+                "revealScreen"
+              );
+
+              launchConfetti();
+
+            }, 1500);
+
+          }
+
+
+          scanBar.style.width =
+            progress + "%";
+
+
+          scanPercent.textContent =
+            progress + "%";
+
+
+          const index =
+            Math.min(
+
+              Math.floor(
+                progress / 17
+              ),
+
+              scanMessages.length - 1
+
+            );
+
+
+          scanTitle.textContent =
+            scanMessages[index][0];
+
+
+          scanText.textContent =
+            scanMessages[index][1];
+
+
+        }, 250);
+
+    }
+
+
+    /* =====================================
+       ICON CONFETTI
+    ====================================== */
+
+    function launchConfetti() {
+
+      const confettiIcons = [
+
+        "heart",
+        "sparkles",
+        "star",
+        "heart-handshake"
+
+      ];
+
+
+      for (let i = 0; i < 45; i++) {
+
+        const piece =
+          document.createElement("i");
+
+
+        piece.setAttribute(
+          "data-lucide",
+          confettiIcons[
+            Math.floor(
+              Math.random() *
+              confettiIcons.length
+            )
+          ]
+        );
+
+
+        piece.style.position =
+          "fixed";
+
+
+        piece.style.left =
+          Math.random() * 100 +
+          "vw";
+
+
+        piece.style.top =
+          "-30px";
+
+
+        piece.style.width =
+          (15 + Math.random() * 12) +
+          "px";
+
+
+        piece.style.height =
+          (15 + Math.random() * 12) +
+          "px";
+
+
+        piece.style.color =
+          "var(--pink)";
+
+
+        piece.style.zIndex =
+          "9999";
+
+
+        piece.style.pointerEvents =
+          "none";
+
+
+        document.body.appendChild(
+          piece
+        );
+
+
+        lucide.createIcons();
+
+
+        const duration =
+          1800 +
+          Math.random() * 2200;
+
+
+        piece.animate(
+
+          [
+
+            {
+              transform:
+                "translateY(0) rotate(0deg)",
+
+              opacity: 1
+
+            },
+
+            {
+
+              transform:
+                `translateY(110vh) rotate(${Math.random() * 720 - 360}deg)`,
+
+              opacity: 0
+
+            }
+
+          ],
+
+          {
+
+            duration: duration,
+
+            easing:
+              "cubic-bezier(.2,.7,.3,1)"
+
+          }
+
+        );
+
+
+        setTimeout(() => {
+
+          piece.remove();
+
+        }, duration);
+
+      }
+
+    }
+
+  </script>
+
+</body>
+</html>
